@@ -120,6 +120,12 @@ subprojects {
         }
     }
 
+    test {
+        testLogging {
+            events "passed", "skipped", "failed", "standardOut", "standardError"
+        }
+    }
+
     // common set of dependencies
     dependencies {
         shadow "org.apache.logging.log4j:log4j-slf4j-impl:${log4jVersion}"
@@ -133,6 +139,9 @@ subprojects {
 
         // allows using Flink's web UI when running in the IDE:
         shadow "org.apache.flink:flink-runtime-web:${flinkVersion}"
+
+        shadow "org.apache.hadoop:hadoop-client:2.8.5"
+
 
         if (project != project(":common")) {
             implementation project(path: ':common')
