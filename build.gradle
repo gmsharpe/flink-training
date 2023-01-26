@@ -94,8 +94,8 @@ subprojects {
     apply plugin: 'eclipse'
 
     ext {
-        javaVersion = '1.8'
-        flinkVersion = '1.15.0'
+        javaVersion = '11'
+        flinkVersion = '1.16.0'
         scalaBinaryVersion = '2.12'
         log4jVersion = '2.12.1'
         junitVersion = '4.13'
@@ -140,7 +140,9 @@ subprojects {
         // allows using Flink's web UI when running in the IDE:
         shadow "org.apache.flink:flink-runtime-web:${flinkVersion}"
 
+        shadow "org.apache.flink:flink-csv:${flinkVersion}"
         shadow "org.apache.hadoop:hadoop-client:2.8.5"
+        shadow "org.apache.flink:flink-connector-files:1.16.0"
 
 
         if (project != project(":common")) {
