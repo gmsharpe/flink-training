@@ -20,13 +20,18 @@ package org.apache.flink.training.solutions.ridecleansing;
 
 import org.apache.flink.api.common.JobExecutionResult;
 import org.apache.flink.api.common.functions.FilterFunction;
+import org.apache.flink.api.common.serialization.SimpleStringEncoder;
+import org.apache.flink.core.fs.Path;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
-import org.apache.flink.streaming.api.functions.sink.PrintSinkFunction;
 import org.apache.flink.streaming.api.functions.sink.SinkFunction;
+import org.apache.flink.streaming.api.functions.sink.filesystem.StreamingFileSink;
+import org.apache.flink.streaming.api.functions.sink.filesystem.rollingpolicies.DefaultRollingPolicy;
 import org.apache.flink.streaming.api.functions.source.SourceFunction;
 import org.apache.flink.training.exercises.common.datatypes.TaxiRide;
 import org.apache.flink.training.exercises.common.sources.TaxiRideGenerator;
 import org.apache.flink.training.exercises.common.utils.GeoUtils;
+
+import java.time.Duration;
 
 /**
  * Solution to the Ride Cleansing exercise from the Flink training.
@@ -39,8 +44,9 @@ public class RideCleansingSolution {
     private final SourceFunction<TaxiRide> source;
     private final SinkFunction<TaxiRide> sink;
 
+
     /** Creates a job using the source and sink provided. */
-    public RideCleansingSolution(SourceFunction<TaxiRide> source, SinkFunction<TaxiRide> sink) {
+    public RideCleansingSolution(SourceFunction<TaxiRide> source,  SinkFunction<TaxiRide> sink) {
 
         this.source = source;
         this.sink = sink;
@@ -51,9 +57,20 @@ public class RideCleansingSolution {
      *
      * @throws Exception which occurs during job execution.
      */
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args) throws Exception
+    {
+        StreamingFileSink fileSink =
+                StreamingFileSink.forRowFormat(new Path(args[0]),
+                                               new SimpleStringEncoder<String>("UTF-8"))
+                                 .withRollingPolicy(DefaultRollingPolicy.builder()
+                                                                        .withRolloverInterval(Duration.ofMinutes(1))
+                                                                        .withInactivityInterval(Duration.ofSeconds(30))
+                                                                        .withMaxPartSize(1024 * 1024 * 1024)
+                                                                        .build())
+                                 .build();
+
         RideCleansingSolution job =
-                new RideCleansingSolution(new TaxiRideGenerator(), new PrintSinkFunction<>());
+                new RideCleansingSolution(new TaxiRideGenerator(), fileSink);
 
         job.execute();
     }
