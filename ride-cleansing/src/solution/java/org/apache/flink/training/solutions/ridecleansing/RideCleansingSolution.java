@@ -24,6 +24,7 @@ import org.apache.flink.api.common.serialization.BulkWriter;
 import org.apache.flink.api.common.serialization.SimpleStringEncoder;
 import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.connector.sink2.Sink;
+import org.apache.flink.configuration.MemorySize;
 import org.apache.flink.connector.file.sink.FileSink;
 import org.apache.flink.core.fs.Path;
 import org.apache.flink.shaded.jackson2.com.fasterxml.jackson.dataformat.csv.CsvFactory;
@@ -86,7 +87,7 @@ public class RideCleansingSolution {
                                  .withRollingPolicy(DefaultRollingPolicy.builder()
                                                                         .withRolloverInterval(Duration.ofMinutes(1))
                                                                         .withInactivityInterval(Duration.ofSeconds(30))
-                                                                        .withMaxPartSize(512 * 512 * 512)
+                                                                        .withMaxPartSize(MemorySize.ofMebiBytes(1))
                                                                         .build())
                                  .build();
 
