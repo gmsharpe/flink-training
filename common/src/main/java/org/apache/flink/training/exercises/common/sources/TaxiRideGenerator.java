@@ -21,6 +21,7 @@ package org.apache.flink.training.exercises.common.sources;
 import org.apache.flink.streaming.api.functions.source.SourceFunction;
 import org.apache.flink.training.exercises.common.datatypes.TaxiRide;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.PriorityQueue;
@@ -74,8 +75,13 @@ public class TaxiRideGenerator implements SourceFunction<TaxiRide> {
             // prepare for the next batch
             id += BATCH_SIZE;
 
-            // don't go too fast
-            Thread.sleep(BATCH_SIZE * SLEEP_MILLIS_PER_EVENT);
+            if(LocalDateTime.now().getMinute() % 5 == 0) {
+                Thread.sleep(1000 * 35);
+            }
+            else {
+                // don't go too fast
+                Thread.sleep(BATCH_SIZE * SLEEP_MILLIS_PER_EVENT);
+            }
         }
     }
 
