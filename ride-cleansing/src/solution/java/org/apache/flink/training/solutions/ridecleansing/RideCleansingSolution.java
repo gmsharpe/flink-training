@@ -71,23 +71,13 @@ public class RideCleansingSolution {
      */
     public static void main(String[] args) throws Exception
     {
-
-        Function<CsvMapper, CsvSchema> schemaGenerator = mapper ->
-                mapper.schemaFor(TaxiRide.class).withoutQuoteChar().withColumnSeparator(',');
-
-        CsvSchema schema = schemaGenerator.apply(new CsvMapper());
-
-
-
-
-
         FileSink fileSink =
                 FileSink.forRowFormat(new Path(args[0]),
                                                new SimpleStringEncoder<String>("UTF-8"))
                                  .withRollingPolicy(DefaultRollingPolicy.builder()
-                                                                        .withRolloverInterval(Duration.ofMinutes(1))
-                                                                        .withInactivityInterval(Duration.ofSeconds(30))
-                                                                        .withMaxPartSize(MemorySize.ofMebiBytes(1))
+                                                                      //  .withRolloverInterval(Duration.ofMinutes(1))
+                                                                      //  .withInactivityInterval(Duration.ofSeconds(30))
+                                                                      //  .withMaxPartSize(MemorySize.ofMebiBytes(1))
                                                                         .build())
                                  .build();
 
