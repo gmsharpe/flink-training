@@ -75,9 +75,9 @@ public class RideCleansingSolution {
                 FileSink.forRowFormat(new Path(args[0]),
                                                new SimpleStringEncoder<String>("UTF-8"))
                                  .withRollingPolicy(DefaultRollingPolicy.builder()
-                                                                      //  .withRolloverInterval(Duration.ofMinutes(1))
-                                                                      //  .withInactivityInterval(Duration.ofSeconds(30))
-                                                                      //  .withMaxPartSize(MemorySize.ofMebiBytes(1))
+                                                                        .withRolloverInterval(Duration.ofMinutes(5))
+                                                                        .withInactivityInterval(Duration.ofSeconds(120))
+                                                                        .withMaxPartSize(new MemorySize(100))
                                                                         .build())
                                  .build();
 
