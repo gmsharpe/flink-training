@@ -157,15 +157,21 @@ public class DataGenerator {
 
         Random random = new Random(rideId);
 
-        if(lowerBound < 0 || upperBound <= lowerBound || decimalPlaces < 0){
-            throw new IllegalArgumentException("Put error message here");
-        }
+        float value;
 
-        final double dbl =
-                ((random == null ? new Random() : random).nextDouble() //
-                        * (upperBound - lowerBound))
-                        + lowerBound;
-        return Float.valueOf(String.format("%." + decimalPlaces + "f", dbl));
+        do {
+            final double dbl =
+                    ((random == null ? new Random() : random).nextDouble() //
+                            * (upperBound - lowerBound))
+                            + lowerBound;
+
+            value = Float.valueOf(String.format("%." + decimalPlaces + "f", dbl));
+
+        } while (value < lowerBound || upperBound <= value);
+
+
+
+        return value;
 
     }
 
