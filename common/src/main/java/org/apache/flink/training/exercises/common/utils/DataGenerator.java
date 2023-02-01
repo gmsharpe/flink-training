@@ -71,24 +71,45 @@ public class DataGenerator {
      * <p>The locations are used in the RideCleansing exercise. We want some rides to be outside of
      * NYC.
      */
-    public float startLat() {
+/*    public float startLat() {
         return aFloat((float) (GeoUtils.LAT_SOUTH - 0.1), (float) (GeoUtils.LAT_NORTH + 0.1F));
     }
 
-    /** Deterministically generates and returns the startLon for this ride. */
+    *//** Deterministically generates and returns the startLon for this ride. *//*
     public float startLon() {
         return aFloat((float) (GeoUtils.LON_WEST - 0.1), (float) (GeoUtils.LON_EAST + 0.1F));
     }
 
-    /** Deterministically generates and returns the endLat for this ride. */
+    *//** Deterministically generates and returns the endLat for this ride. *//*
     public float endLat() {
         return bFloat((float) (GeoUtils.LAT_SOUTH - 0.1), (float) (GeoUtils.LAT_NORTH + 0.1F));
     }
 
-    /** Deterministically generates and returns the endLon for this ride. */
+    *//** Deterministically generates and returns the endLon for this ride. *//*
     public float endLon() {
         return bFloat((float) (GeoUtils.LON_WEST - 0.1), (float) (GeoUtils.LON_EAST + 0.1F));
+    }*/
+
+    public float startLat() {
+        return getRandomValue (rideId, (float) (GeoUtils.LAT_SOUTH - 0.1), (float) (GeoUtils.LAT_NORTH + 0.1F), 8);
+
     }
+
+    /** Deterministically generates and returns the startLon for this ride. */
+    public float startLon() {
+        return getRandomValue (rideId, (float) GeoUtils.LON_WEST - 0.1F, (float) (GeoUtils.LON_EAST + 0.1F), 8);
+    }
+
+    /** Deterministically generates and returns the endLat for this ride. */
+    public float endLat() {
+        return  getRandomValue (rideId, (float) (GeoUtils.LAT_SOUTH - 0.1),  (float) (GeoUtils.LAT_NORTH + 0.1F), 8);
+    }
+
+    /** Deterministically generates and returns the endLon for this ride. */
+    public float endLon() {
+        return getRandomValue (rideId, (float) GeoUtils.LON_WEST - 0.1F, (float) (GeoUtils.LON_EAST + 0.1F), 8);
+    }
+
 
     /** Deterministically generates and returns the passengerCnt for this ride. */
     public short passengerCnt() {
@@ -128,6 +149,25 @@ public class DataGenerator {
     }
 
     // -------------------------------------
+
+    public static float getRandomValue(final long rideId,
+                                        final float lowerBound,
+                                        final float upperBound,
+                                        final int decimalPlaces){
+
+        Random random = new Random(rideId);
+
+        if(lowerBound < 0 || upperBound <= lowerBound || decimalPlaces < 0){
+            throw new IllegalArgumentException("Put error message here");
+        }
+
+        final double dbl =
+                ((random == null ? new Random() : random).nextDouble() //
+                        * (upperBound - lowerBound))
+                        + lowerBound;
+        return Float.valueOf(String.format("%." + decimalPlaces + "f", dbl));
+
+    }
 
     private long aLong(long min, long max) {
         float mean = (min + max) / 2.0F;
