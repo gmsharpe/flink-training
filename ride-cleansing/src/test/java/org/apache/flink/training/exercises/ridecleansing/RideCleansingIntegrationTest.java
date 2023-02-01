@@ -19,6 +19,7 @@
 package org.apache.flink.training.exercises.ridecleansing;
 
 import org.apache.flink.api.common.JobExecutionResult;
+import org.apache.flink.api.connector.sink2.Sink;
 import org.apache.flink.runtime.testutils.MiniClusterResourceConfiguration;
 import org.apache.flink.test.util.MiniClusterWithClientResource;
 import org.apache.flink.training.exercises.common.datatypes.TaxiRide;
@@ -67,7 +68,7 @@ public class RideCleansingIntegrationTest extends RideCleansingTestBase {
         ExecutablePipeline<TaxiRide, TaxiRide> exercise =
                 (source, sink) -> (new RideCleansingExercise(source, sink)).execute();
         ExecutablePipeline<TaxiRide, TaxiRide> solution =
-                (source, sink) -> (new RideCleansingSolution(source, sink)).execute();
+                (source, sink) -> (new RideCleansingSolution(source, (Sink<TaxiRide>) sink)).execute();
 
         return new ComposedPipeline<>(exercise, solution);
     }
