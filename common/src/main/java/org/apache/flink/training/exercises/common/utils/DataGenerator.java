@@ -141,7 +141,7 @@ public class DataGenerator {
         Random rnd = new Random(rideId);
         long value;
         do {
-            value = (long) Math.round((stddev * rnd.nextGaussian()) + mean);
+            value = (long) Math.round((stddev * rnd.nextGaussian()) + ((rnd.nextBoolean() ? -1 : 1) * mean));
         } while ((value < min) || (value > max));
         return value;
     }
