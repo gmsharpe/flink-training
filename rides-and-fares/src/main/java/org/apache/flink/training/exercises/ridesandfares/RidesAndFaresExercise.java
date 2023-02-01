@@ -89,7 +89,7 @@ public class RidesAndFaresExercise {
 
         RidesAndFaresExercise job =
                 new RidesAndFaresExercise(
-                        new TaxiRideGenerator(),
+                        new TaxiRideGenerator(args[0]),
                         new TaxiFareGenerator(),
                         new PrintSinkFunction<>());
 
