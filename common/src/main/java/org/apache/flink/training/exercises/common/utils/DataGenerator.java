@@ -138,7 +138,7 @@ public class DataGenerator {
 
     // the rideId is used as the seed to guarantee deterministic results
     private long aLong(long min, long max, float mean, float stddev) {
-        Random rnd = new Random(rideId);
+        Random rnd = new Random();
         long value;
         do {
             value = (long) Math.round((stddev * rnd.nextGaussian()) + ((rnd.nextBoolean() ? -1 : 1) * mean));
