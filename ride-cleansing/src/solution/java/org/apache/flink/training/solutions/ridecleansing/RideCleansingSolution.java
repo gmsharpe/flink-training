@@ -70,7 +70,7 @@ public class RideCleansingSolution {
                                  .withRollingPolicy(DefaultRollingPolicy.builder()
                                                                         .withRolloverInterval(Duration.ofMinutes(5))
                                                                         .withInactivityInterval(Duration.ofSeconds(120))
-                                                                        .withMaxPartSize(new MemorySize(100))
+                                                                        .withMaxPartSize(new MemorySize(1000000))
                                                                         .build())
                                  .build();
 
