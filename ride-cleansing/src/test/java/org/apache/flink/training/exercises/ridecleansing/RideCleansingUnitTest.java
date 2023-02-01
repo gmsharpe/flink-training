@@ -58,6 +58,7 @@ public class RideCleansingUnitTest extends RideCleansingTestBase {
     public void testRideThatStartsAndEndsOutsideNYC() throws Exception {
 
         TaxiRide atNorthPole = testRide(0, 90, 0, 90);
+        System.out.println(atNorthPole);
         assertThat(filterFunction().filter(atNorthPole)).isFalse();
     }
 }

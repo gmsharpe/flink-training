@@ -53,7 +53,7 @@ public class RideCleansingExercise {
      */
     public static void main(String[] args) throws Exception {
         RideCleansingExercise job =
-                new RideCleansingExercise(new TaxiRideGenerator(), new PrintSinkFunction<>());
+                new RideCleansingExercise(new TaxiRideGenerator(args[0]), new PrintSinkFunction<>());
 
         job.execute();
     }

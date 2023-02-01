@@ -19,23 +19,16 @@
 package org.apache.flink.training.solutions.ridecleansing;
 
 import org.apache.flink.api.common.JobExecutionResult;
+import org.apache.flink.api.common.eventtime.WatermarkGenerator;
+import org.apache.flink.api.common.eventtime.WatermarkGeneratorSupplier;
+import org.apache.flink.api.common.eventtime.WatermarkStrategy;
 import org.apache.flink.api.common.functions.FilterFunction;
-import org.apache.flink.api.common.serialization.BulkWriter;
 import org.apache.flink.api.common.serialization.SimpleStringEncoder;
-import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.connector.sink2.Sink;
 import org.apache.flink.configuration.MemorySize;
 import org.apache.flink.connector.file.sink.FileSink;
 import org.apache.flink.core.fs.Path;
-import org.apache.flink.shaded.jackson2.com.fasterxml.jackson.dataformat.csv.CsvFactory;
-import org.apache.flink.shaded.jackson2.com.fasterxml.jackson.dataformat.csv.CsvFactoryBuilder;
-import org.apache.flink.shaded.jackson2.com.fasterxml.jackson.dataformat.csv.CsvMapper;
-import org.apache.flink.shaded.jackson2.com.fasterxml.jackson.dataformat.csv.CsvSchema;
-import org.apache.flink.shaded.jackson2.com.fasterxml.jackson.dataformat.csv.impl.CsvEncoder;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
-import org.apache.flink.streaming.api.functions.sink.SinkFunction;
-import org.apache.flink.streaming.api.functions.sink.filesystem.OutputFileConfig;
-import org.apache.flink.streaming.api.functions.sink.filesystem.StreamingFileSink;
 import org.apache.flink.streaming.api.functions.sink.filesystem.rollingpolicies.DefaultRollingPolicy;
 import org.apache.flink.streaming.api.functions.source.SourceFunction;
 import org.apache.flink.training.exercises.common.datatypes.TaxiRide;
@@ -43,7 +36,6 @@ import org.apache.flink.training.exercises.common.sources.TaxiRideGenerator;
 import org.apache.flink.training.exercises.common.utils.GeoUtils;
 
 import java.time.Duration;
-import java.util.function.Function;
 
 /**
  * Solution to the Ride Cleansing exercise from the Flink training.
@@ -54,14 +46,15 @@ import java.util.function.Function;
 public class RideCleansingSolution {
 
     private final SourceFunction<TaxiRide> source;
-    private final Sink<TaxiRide> sink;
+    private final Sink<TaxiRide> inNYSink;
+
 
 
     /** Creates a job using the source and sink provided. */
-    public RideCleansingSolution(SourceFunction<TaxiRide> source,  Sink<TaxiRide> sink) {
+    public RideCleansingSolution(SourceFunction<TaxiRide> source,  Sink<TaxiRide> inNYSink) {
 
         this.source = source;
-        this.sink = sink;
+        this.inNYSink = inNYSink;
     }
 
     /**
@@ -71,8 +64,8 @@ public class RideCleansingSolution {
      */
     public static void main(String[] args) throws Exception
     {
-        FileSink fileSink =
-                FileSink.forRowFormat(new Path(args[0]),
+        FileSink inNYFileSink =
+                FileSink.forRowFormat(new Path(args[1]),
                                                new SimpleStringEncoder<String>("UTF-8"))
                                  .withRollingPolicy(DefaultRollingPolicy.builder()
                                                                         .withRolloverInterval(Duration.ofMinutes(5))
@@ -82,7 +75,7 @@ public class RideCleansingSolution {
                                  .build();
 
         RideCleansingSolution job =
-                new RideCleansingSolution(new TaxiRideGenerator(), fileSink);
+                new RideCleansingSolution(new TaxiRideGenerator(args[0]), inNYFileSink);
 
         job.execute();
     }
@@ -99,7 +92,7 @@ public class RideCleansingSolution {
         StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
 
         // set up the pipeline
-        env.addSource(source).filter(new NYCFilter()).sinkTo(sink);
+        env.addSource(source).filter(new NYCFilter()).sinkTo(inNYSink);
 
         // run the pipeline and return the result
         return env.execute("Taxi Ride Cleansing");

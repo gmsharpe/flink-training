@@ -100,7 +100,7 @@ public class RidesAndFaresSolution {
 
         RidesAndFaresSolution job =
                 new RidesAndFaresSolution(
-                        new TaxiRideGenerator(),
+                        new TaxiRideGenerator(args[0]),
                         new TaxiFareGenerator(),
                         new PrintSinkFunction<>());
 

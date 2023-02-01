@@ -21,6 +21,13 @@ package org.apache.flink.training.exercises.common.sources;
 import org.apache.flink.streaming.api.functions.source.SourceFunction;
 import org.apache.flink.training.exercises.common.datatypes.TaxiRide;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
+import java.nio.file.attribute.FileAttribute;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -37,6 +44,29 @@ public class TaxiRideGenerator implements SourceFunction<TaxiRide> {
     public static final int SLEEP_MILLIS_PER_EVENT = 10;
     private static final int BATCH_SIZE = 5;
     private volatile boolean running = true;
+    private final String sourceEventLogFile;
+
+    public TaxiRideGenerator(String sourceEventLogFile) throws IOException
+    {
+        this.sourceEventLogFile = sourceEventLogFile;
+        Path sourceEventLogPath = Paths.get(this.sourceEventLogFile);
+        if(!Files.exists(sourceEventLogPath)) {
+            Files.createDirectories(sourceEventLogPath.getParent());
+            Files.createFile(sourceEventLogPath);
+        }
+        else {
+            Files.delete(Paths.get(this.sourceEventLogFile));
+            Files.createFile(sourceEventLogPath);
+        }
+
+        // append headers
+        String headers = "rideId,isStart,eventTime,startLon,startLat,endLon," +
+                         "endLat,passengerCnt,taxiId,driverId";
+
+        Files.write(Paths.get(sourceEventLogFile),
+                    (headers + '\n').getBytes(),
+                    StandardOpenOption.APPEND);
+    }
 
     @Override
     public void run(SourceContext<TaxiRide> ctx) throws Exception {
@@ -66,11 +96,15 @@ public class TaxiRideGenerator implements SourceFunction<TaxiRide> {
             while (endEventQ.peek().getEventTimeMillis() <= maxStartTime) {
                 TaxiRide ride = endEventQ.poll();
                 ctx.collect(ride);
+                appendSourceEvent(ride);
             }
 
             // then emit the new START events (out-of-order)
             java.util.Collections.shuffle(startEvents, new Random(id));
-            startEvents.iterator().forEachRemaining(r -> ctx.collect(r));
+            startEvents.iterator().forEachRemaining(ride -> {
+                ctx.collect(ride);
+                appendSourceEvent(ride);
+            });
 
             // prepare for the next batch
             id += BATCH_SIZE;
@@ -82,6 +116,18 @@ public class TaxiRideGenerator implements SourceFunction<TaxiRide> {
                 // don't go too fast
                 Thread.sleep(BATCH_SIZE * SLEEP_MILLIS_PER_EVENT);
             }
+        }
+    }
+
+    private void appendSourceEvent(TaxiRide ride)
+    {
+        try {
+            Files.write(Paths.get(sourceEventLogFile),
+                        (ride.toString() + '\n').getBytes(),
+                        StandardOpenOption.APPEND);
+        }
+        catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
