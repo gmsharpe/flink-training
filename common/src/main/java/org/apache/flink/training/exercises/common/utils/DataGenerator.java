@@ -155,7 +155,7 @@ public class DataGenerator {
                                         final float upperBound,
                                         final int decimalPlaces){
 
-        Random random = new Random(rideId);
+        Random random = new Random();
 
         float value;
 
