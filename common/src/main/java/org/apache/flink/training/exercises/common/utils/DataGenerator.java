@@ -97,17 +97,17 @@ public class DataGenerator {
 
     /** Deterministically generates and returns the startLon for this ride. */
     public float startLon() {
-        return getRandomValue (rideId, (float) GeoUtils.LON_WEST - 0.1F, (float) (GeoUtils.LON_EAST + 0.1F), 8);
+        return getRandomValue (rideId, (float) (GeoUtils.LON_WEST - 0.1F), (float) (GeoUtils.LON_EAST + 0.1F), 8);
     }
 
     /** Deterministically generates and returns the endLat for this ride. */
     public float endLat() {
-        return  getRandomValue (rideId, (float) (GeoUtils.LAT_SOUTH - 0.1),  (float) (GeoUtils.LAT_NORTH + 0.1F), 8);
+        return  getRandomValue (rideId + 42, (float) (GeoUtils.LAT_SOUTH - 0.1),  (float) (GeoUtils.LAT_NORTH + 0.1F), 8);
     }
 
     /** Deterministically generates and returns the endLon for this ride. */
     public float endLon() {
-        return getRandomValue (rideId, (float) GeoUtils.LON_WEST - 0.1F, (float) (GeoUtils.LON_EAST + 0.1F), 8);
+        return getRandomValue (rideId + 42, (float) GeoUtils.LON_WEST - 0.1F, (float) (GeoUtils.LON_EAST + 0.1F), 8);
     }
 
 
@@ -178,7 +178,7 @@ public class DataGenerator {
 
     // the rideId is used as the seed to guarantee deterministic results
     private long aLong(long min, long max, float mean, float stddev) {
-        Random rnd = new Random();
+        Random rnd = new Random(rideId);
         long value;
         do {
             value = (long) Math.round((stddev * rnd.nextGaussian()) + ((rnd.nextBoolean() ? -1 : 1) * mean));
