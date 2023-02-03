@@ -28,7 +28,7 @@ import java.util.Random;
  * that the eventTime for a TaxiRide START event matches the startTime for the TaxiFare event for
  * that same rideId.
  */
-public class DataGenerator {
+public class DataGenerator implements IDataGenerator {
 
     private static final int SECONDS_BETWEEN_RIDES = 20;
     private static final int NUMBER_OF_DRIVERS = 200;
@@ -42,11 +42,13 @@ public class DataGenerator {
     }
 
     /** Deterministically generates and returns the startTime for this ride. */
+    @Override
     public Instant startTime() {
         return BEGINNING.plusSeconds(SECONDS_BETWEEN_RIDES * rideId);
     }
 
     /** Deterministically generates and returns the endTime for this ride. */
+    @Override
     public Instant endTime() {
         return startTime().plusSeconds(60 * rideDurationMinutes());
     }
@@ -55,12 +57,14 @@ public class DataGenerator {
      * Deterministically generates and returns the driverId for this ride. The HourlyTips exercise
      * is more interesting if aren't too many drivers.
      */
+    @Override
     public long driverId() {
         Random rnd = new Random(rideId);
         return 2013000000 + rnd.nextInt(NUMBER_OF_DRIVERS);
     }
 
     /** Deterministically generates and returns the taxiId for this ride. */
+    @Override
     public long taxiId() {
         return driverId();
     }
@@ -90,33 +94,39 @@ public class DataGenerator {
         return bFloat((float) (GeoUtils.LON_WEST - 0.1), (float) (GeoUtils.LON_EAST + 0.1F));
     }*/
 
+    @Override
     public float startLat() {
         return getRandomValue (rideId, (float) (GeoUtils.LAT_SOUTH - 0.1), (float) (GeoUtils.LAT_NORTH + 0.1F), 8);
 
     }
 
     /** Deterministically generates and returns the startLon for this ride. */
+    @Override
     public float startLon() {
         return getRandomValue (rideId, (float) (GeoUtils.LON_WEST - 0.1F), (float) (GeoUtils.LON_EAST + 0.1F), 8);
     }
 
     /** Deterministically generates and returns the endLat for this ride. */
+    @Override
     public float endLat() {
         return  getRandomValue (rideId + 42, (float) (GeoUtils.LAT_SOUTH - 0.1),  (float) (GeoUtils.LAT_NORTH + 0.1F), 8);
     }
 
     /** Deterministically generates and returns the endLon for this ride. */
+    @Override
     public float endLon() {
         return getRandomValue (rideId + 42, (float) GeoUtils.LON_WEST - 0.1F, (float) (GeoUtils.LON_EAST + 0.1F), 8);
     }
 
 
     /** Deterministically generates and returns the passengerCnt for this ride. */
+    @Override
     public short passengerCnt() {
         return (short) aLong(1L, 4L);
     }
 
     /** Deterministically generates and returns the paymentType for this ride. */
+    @Override
     public String paymentType() {
         return (rideId % 2 == 0) ? "CARD" : "CASH";
     }
@@ -127,16 +137,19 @@ public class DataGenerator {
      * <p>The HourlyTips exercise is more interesting if there's some significant variation in
      * tipping.
      */
+    @Override
     public float tip() {
         return aLong(0L, 60L, 10F, 15F);
     }
 
     /** Deterministically generates and returns the tolls for this ride. */
+    @Override
     public float tolls() {
         return (rideId % 10 == 0) ? aLong(0L, 5L) : 0L;
     }
 
     /** Deterministically generates and returns the totalFare for this ride. */
+    @Override
     public float totalFare() {
         return (float) (3.0 + (1.0 * rideDurationMinutes()) + tip() + tolls());
     }
@@ -144,7 +157,8 @@ public class DataGenerator {
     /**
      * The LongRides exercise needs to have some rides with a duration > 2 hours, but not too many.
      */
-    private long rideDurationMinutes() {
+    @Override
+    public long rideDurationMinutes() {
         return aLong(0L, 600, 20, 40);
     }
 

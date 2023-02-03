@@ -18,8 +18,15 @@
 
 package org.apache.flink.training.exercises.common.sources;
 
+import org.apache.flink.shaded.jackson2.com.fasterxml.jackson.databind.MappingIterator;
+import org.apache.flink.shaded.jackson2.com.fasterxml.jackson.dataformat.csv.CsvMapper;
+import org.apache.flink.shaded.jackson2.com.fasterxml.jackson.dataformat.csv.CsvParser;
+import org.apache.flink.shaded.jackson2.com.fasterxml.jackson.dataformat.csv.CsvSchema;
+import org.apache.flink.shaded.jackson2.com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.apache.flink.streaming.api.functions.source.SourceFunction;
 import org.apache.flink.training.exercises.common.datatypes.TaxiRide;
+import org.apache.flink.training.exercises.common.utils.DataGenerator;
+import org.apache.flink.training.exercises.common.utils.DataLoader;
 
 import java.io.File;
 import java.io.IOException;
@@ -29,10 +36,8 @@ import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.nio.file.attribute.FileAttribute;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.PriorityQueue;
-import java.util.Random;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * This SourceFunction generates a data stream of TaxiRide records.
@@ -46,8 +51,47 @@ public class TaxiRideGenerator implements SourceFunction<TaxiRide> {
     private volatile boolean running = true;
     private final String sourceEventLogFile;
 
-    public TaxiRideGenerator(String sourceEventLogFile) throws IOException
+    public Map<Integer, Map<String, String>> locationsById;
+
+    public static Map<Integer, Map<String, String>> loadLocationMap(String path) throws IOException {
+        CsvMapper mapper = new CsvMapper();
+        mapper.registerModule(new JavaTimeModule());
+        mapper.enable(CsvParser.Feature.WRAP_AS_ARRAY);
+        CsvSchema.Builder builder = CsvSchema.builder();
+        // use first row as header otherwise defaults are fine
+        CsvSchema schema = builder.setUseHeader(true).build();
+
+        MappingIterator<Map<String, String>> it = mapper
+                .readerFor(Map.class)
+                .with(schema)
+                .readValues(new File(path));
+
+        List<Map<String, String>> locations = it.readAll();
+
+        final List<Integer> ids = new ArrayList<>();
+
+        // TODO - could convert these to integers in original python script for generating the location map
+        Map<Integer, Map<String, String>> locationMap = locations.stream()
+                .filter(l -> !ids.contains(new Double(l.get("location_i")).intValue()))
+                .map(l ->
+                    {
+                        ids.add(new Double(l.get("location_i")).intValue());
+                        return l;
+                    })
+                .collect(Collectors.toMap(
+                        location -> new Double(location.get("location_i")).intValue(), // key mapper
+                        location -> location)); //value mapper
+
+        return locationMap;
+    }
+
+    Queue<DataLoader> taxiEventQueue;
+
+    public TaxiRideGenerator(String sourceEventLogFile, String csvSourceData, String csvLocationMapData) throws IOException
     {
+        taxiEventQueue = new LinkedList<>(DataLoader.readAllLines(csvSourceData));
+        locationsById = loadLocationMap(csvLocationMapData);
+
         this.sourceEventLogFile = sourceEventLogFile;
         Path sourceEventLogPath = Paths.get(this.sourceEventLogFile);
         if(!Files.exists(sourceEventLogPath)) {
@@ -75,20 +119,21 @@ public class TaxiRideGenerator implements SourceFunction<TaxiRide> {
         long id = 0;
         long maxStartTime = 0;
 
-        while (running) {
+        // generate a batch of START events
+        List<TaxiRide> startEvents = new ArrayList<TaxiRide>(BATCH_SIZE);
 
-            // generate a batch of START events
-            List<TaxiRide> startEvents = new ArrayList<TaxiRide>(BATCH_SIZE);
+        while(!taxiEventQueue.isEmpty()) {
             for (int i = 1; i <= BATCH_SIZE; i++) {
-                TaxiRide ride = new TaxiRide(id + i, true);
+
+                DataLoader loader = taxiEventQueue.poll();
+                TaxiRide ride = new TaxiRide(id + i, true, loader.setLatLongCoordinates(locationsById));
+
+
                 startEvents.add(ride);
                 // the start times may be in order, but let's not assume that
                 maxStartTime = Math.max(maxStartTime, ride.getEventTimeMillis());
-            }
 
-            // enqueue the corresponding END events
-            for (int i = 1; i <= BATCH_SIZE; i++) {
-                endEventQ.add(new TaxiRide(id + i, false));
+                endEventQ.add(new TaxiRide(id + i, false, loader.setLatLongCoordinates(locationsById)));
             }
 
             // release the END events coming before the end of this new batch

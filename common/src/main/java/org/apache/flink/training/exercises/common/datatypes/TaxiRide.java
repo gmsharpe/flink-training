@@ -22,9 +22,13 @@ import org.apache.flink.annotation.VisibleForTesting;
 import org.apache.flink.streaming.runtime.streamrecord.StreamRecord;
 import org.apache.flink.training.exercises.common.utils.DataGenerator;
 import org.apache.flink.training.exercises.common.utils.GeoUtils;
+import org.apache.flink.training.exercises.common.utils.IDataGenerator;
+import org.codehaus.jackson.annotate.JsonProperty;
+import org.codehaus.jackson.map.ObjectMapper;
 
 import javax.annotation.Nullable;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.time.Instant;
 import java.util.Objects;
@@ -46,8 +50,7 @@ public class TaxiRide implements Comparable<TaxiRide>, Serializable {
     }
 
     /** Invents a TaxiRide. */
-    public TaxiRide(long rideId, boolean isStart) {
-        DataGenerator g = new DataGenerator(rideId);
+    public TaxiRide(long rideId, boolean isStart, IDataGenerator g) {
 
         this.rideId = rideId;
         this.isStart = isStart;
@@ -85,16 +88,111 @@ public class TaxiRide implements Comparable<TaxiRide>, Serializable {
         this.driverId = driverId;
     }
 
+
+    @JsonProperty("lpep_pickup_datetime")
+    public Instant startTime;
+    @JsonProperty("lpep_dropoff_datetime")
+    public Instant endTime;
+
+    public long driverId;
+
+    @JsonProperty("VendorID")
+    public long taxiId;
+    @JsonProperty("PULocationID")
+    int pULocationId;
+    @JsonProperty("DOLocationID")
+    int dOLocationId;
+
+    public float startLat;
+    public float startLon;
+    public float endLat;
+    public float endLon;
+    @JsonProperty("passenger_count")
+    public short passengerCnt;
+
     public long rideId;
     public boolean isStart;
     public Instant eventTime;
-    public float startLon;
-    public float startLat;
-    public float endLon;
-    public float endLat;
-    public short passengerCnt;
-    public long taxiId;
-    public long driverId;
+
+
+
+    public TaxiRide setStartTime(Instant startTime) {
+        this.startTime = startTime;
+		return this;        
+    }
+
+    public TaxiRide setEndTime(Instant endTime) {
+        this.endTime = endTime;
+		return this;
+    }
+
+    public TaxiRide setDriverId(long driverId) {
+        this.driverId = driverId;
+		return this;
+    }
+
+    public TaxiRide setTaxiId(long taxiId) {
+        this.taxiId = taxiId;
+		return this;
+    }
+
+    public TaxiRide setpULocationId(int pULocationId) {
+        this.pULocationId = pULocationId;
+		return this;
+    }
+
+    public TaxiRide setdOLocationId(int dOLocationId) {
+        this.dOLocationId = dOLocationId;
+		return this;
+    }
+
+    public TaxiRide setStartLat(float startLat) {
+        this.startLat = startLat;
+		return this;
+    }
+
+    public TaxiRide setStartLon(float startLon) {
+        this.startLon = startLon;
+        return this;
+    }
+
+    public TaxiRide setEndLat(float endLat) {
+        this.endLat = endLat;
+        return this;
+    }
+
+    public TaxiRide setEndLon(float endLon) {
+        this.endLon = endLon;
+        return this;
+    }
+
+    public TaxiRide setPassengerCnt(short passengerCnt) {
+        this.passengerCnt = passengerCnt;
+        return this;
+    }
+
+    public TaxiRide setRideId(long rideId) {
+        this.rideId = rideId;
+        return this;
+    }
+
+    public TaxiRide setStart(boolean start) {
+        isStart = start;
+        return this;
+    }
+
+    public TaxiRide setEventTime(Instant eventTime) {
+        this.eventTime = eventTime;
+        return this;
+    }
+
+
+
+
+    @Override
+    public TaxiRide clone() {
+        return clone();
+    }
 
     @Override
     public String toString() {

@@ -90,7 +90,7 @@ public class LongRidesExercise {
      */
     public static void main(String[] args) throws Exception {
         LongRidesExercise job =
-                new LongRidesExercise(new TaxiRideGenerator(args[0]), new PrintSinkFunction<>());
+                new LongRidesExercise(new TaxiRideGenerator(args[0], args[2], args[3]), new PrintSinkFunction<>());
 
         job.execute();
     }

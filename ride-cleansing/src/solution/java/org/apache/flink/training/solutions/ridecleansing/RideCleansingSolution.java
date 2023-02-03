@@ -75,7 +75,7 @@ public class RideCleansingSolution {
                                  .build();
 
         RideCleansingSolution job =
-                new RideCleansingSolution(new TaxiRideGenerator(args[0]), inNYFileSink);
+                new RideCleansingSolution(new TaxiRideGenerator(args[0], args[2], args[3]), inNYFileSink);
 
         job.execute();
     }

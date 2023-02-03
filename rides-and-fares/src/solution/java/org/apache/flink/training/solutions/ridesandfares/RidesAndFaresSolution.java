@@ -100,8 +100,8 @@ public class RidesAndFaresSolution {
 
         RidesAndFaresSolution job =
                 new RidesAndFaresSolution(
-                        new TaxiRideGenerator(args[0]),
-                        new TaxiFareGenerator(),
+                        new TaxiRideGenerator(args[0], args[2], args[3]),
+                        new TaxiFareGenerator(args[2]),
                         new PrintSinkFunction<>());
 
         // Setting up checkpointing so that the state can be explored with the State Processor API.

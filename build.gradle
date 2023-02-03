@@ -139,6 +139,7 @@ subprojects {
 
         // allows using Flink's web UI when running in the IDE:
         shadow "org.apache.flink:flink-runtime-web:${flinkVersion}"
+        shadow "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.14.2"
 
         shadow "org.apache.flink:flink-csv:${flinkVersion}"
         shadow "org.apache.hadoop:hadoop-client:2.8.5"

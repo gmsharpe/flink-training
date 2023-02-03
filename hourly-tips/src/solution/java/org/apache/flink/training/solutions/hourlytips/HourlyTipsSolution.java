@@ -61,7 +61,7 @@ public class HourlyTipsSolution {
     public static void main(String[] args) throws Exception {
 
         HourlyTipsSolution job =
-                new HourlyTipsSolution(new TaxiFareGenerator(), new PrintSinkFunction<>());
+                new HourlyTipsSolution(new TaxiFareGenerator(args[2]), new PrintSinkFunction<>());
 
         job.execute();
     }

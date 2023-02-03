@@ -21,6 +21,7 @@ package org.apache.flink.training.exercises.common.datatypes;
 import org.apache.flink.annotation.VisibleForTesting;
 import org.apache.flink.streaming.runtime.streamrecord.StreamRecord;
 import org.apache.flink.training.exercises.common.utils.DataGenerator;
+import org.apache.flink.training.exercises.common.utils.IDataGenerator;
 
 import java.io.Serializable;
 import java.time.Instant;
@@ -42,8 +43,8 @@ public class TaxiFare implements Serializable {
     }
 
     /** Invents a TaxiFare. */
-    public TaxiFare(long rideId) {
-        DataGenerator g = new DataGenerator(rideId);
+    public TaxiFare(long rideId, IDataGenerator g) {
+
 
         this.rideId = rideId;
         this.taxiId = g.taxiId();
