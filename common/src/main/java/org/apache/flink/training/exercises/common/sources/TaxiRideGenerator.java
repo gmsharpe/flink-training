@@ -105,7 +105,7 @@ public class TaxiRideGenerator implements SourceFunction<TaxiRide> {
 
         // append headers
         String headers = "rideId,isStart,eventTime,startLon,startLat,endLon," +
-                         "endLat,passengerCnt,taxiId,driverId";
+                         "endLat,passengerCnt,taxiId,driverId,pULocationId,dOLocationId";
 
         Files.write(Paths.get(sourceEventLogFile),
                     (headers + '\n').getBytes(),
@@ -167,6 +167,7 @@ public class TaxiRideGenerator implements SourceFunction<TaxiRide> {
     private void appendSourceEvent(TaxiRide ride)
     {
         try {
+            String ridle =ride.toString();
             Files.write(Paths.get(sourceEventLogFile),
                         (ride.toString() + '\n').getBytes(),
                         StandardOpenOption.APPEND);
