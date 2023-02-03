@@ -162,6 +162,16 @@ public class DataGenerator implements IDataGenerator {
         return aLong(0L, 600, 20, 40);
     }
 
+    @Override
+    public int pULocationId() {
+        return 0;
+    }
+
+    @Override
+    public int dOLocationId() {
+        return 0;
+    }
+
     // -------------------------------------
 
     public static float getRandomValue(final long rideId,

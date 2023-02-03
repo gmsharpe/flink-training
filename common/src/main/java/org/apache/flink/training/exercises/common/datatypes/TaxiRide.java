@@ -62,6 +62,8 @@ public class TaxiRide implements Comparable<TaxiRide>, Serializable {
         this.passengerCnt = g.passengerCnt();
         this.taxiId = g.taxiId();
         this.driverId = g.driverId();
+        this.pULocationId = g.pULocationId();
+        this.dOLocationId = g.dOLocationId();
     }
 
     /** Creates a TaxiRide with the given parameters. */
@@ -215,7 +217,11 @@ public class TaxiRide implements Comparable<TaxiRide>, Serializable {
                 + ","
                 + taxiId
                 + ","
-                + driverId;
+                + driverId
+                + ","
+                + pULocationId
+                + ","
+                + dOLocationId;
     }
 
     /**

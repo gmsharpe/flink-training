@@ -35,4 +35,8 @@ public interface IDataGenerator {
     float totalFare();
 
     long rideDurationMinutes();
+
+    int pULocationId();
+
+    int dOLocationId();
 }
