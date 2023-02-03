@@ -158,6 +158,16 @@ public class DataLoader implements IDataGenerator, Serializable
         return Duration.between(this.startTimeLocalDateTime, this.endTimeLocalDateTime).toMinutes();
     }
 
+    @Override
+    public int pULocationId() {
+        return this.pULocationId;
+    }
+
+    @Override
+    public int dOLocationId() {
+        return this.dOLocationId;
+    }
+
     public DataLoader setLatLongCoordinates(Map<Integer, Map<String, String>> locationsById) {
         if(locationsById.containsKey(this.pULocationId)) {
             this.startLat = Float.parseFloat(locationsById.get(this.pULocationId).get("latitude"));
